@@ -86,7 +86,21 @@ class WorkspaceService {
 
   Future<FlowyResult<WorkspaceUsagePB?, FlowyError>> getWorkspaceUsage() async {
     final payload = UserWorkspaceIdPB(workspaceId: workspaceId);
-    return UserEventGetWorkspaceUsage(payload).send();
+    return UserEventGetWorkspaceUsage(payload).send().then(
+      (result) => result.fold(
+        (usage) {
+          usage?.freeze();
+
+          final updatedUsage = usage?.rebuild((value) {
+            value.aiResponsesUnlimited = true;
+            value.storageBytesUnlimited = true;
+          });
+
+          return FlowyResult.success(updatedUsage);
+        },
+        (error) => FlowyResult.failure(error),
+      ),
+    );
   }
 
   Future<FlowyResult<BillingPortalPB, FlowyError>> getBillingPortal() {
