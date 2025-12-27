@@ -383,9 +383,9 @@ impl From<RecurringInterval> for RecurringIntervalPB {
 
 #[derive(ProtoBuf_Enum, Clone, Default, Debug, Serialize, Deserialize)]
 pub enum SubscriptionPlanPB {
-  #[default]
   Free = 0,
   Pro = 1,
+  #[default]
   Team = 2,
 
   // Add-ons
@@ -538,10 +538,10 @@ pub struct WorkspaceSubscriptionInfoPB {
 impl WorkspaceSubscriptionInfoPB {
   pub fn default_from_workspace_id(workspace_id: String) -> Self {
     Self {
-      plan: WorkspacePlanPB::FreePlan,
+      plan: WorkspacePlanPB::TeamPlan,
       plan_subscription: WorkspaceSubscriptionV2PB {
         workspace_id,
-        subscription_plan: SubscriptionPlanPB::Free,
+        subscription_plan: SubscriptionPlanPB::Team,
         status: WorkspaceSubscriptionStatusPB::Active,
         end_date: 0,
         interval: RecurringIntervalPB::Month,
@@ -603,9 +603,9 @@ impl From<Vec<WorkspaceSubscriptionStatus>> for WorkspaceSubscriptionInfoPB {
 
 #[derive(ProtoBuf_Enum, Debug, Clone, Eq, PartialEq, Default)]
 pub enum WorkspacePlanPB {
-  #[default]
   FreePlan = 0,
   ProPlan = 1,
+  #[default]
   TeamPlan = 2,
 }
 
@@ -663,7 +663,7 @@ impl WorkspaceSubscriptionV2PB {
   pub fn default_with_workspace_id(workspace_id: String) -> Self {
     Self {
       workspace_id,
-      subscription_plan: SubscriptionPlanPB::Free,
+      subscription_plan: SubscriptionPlanPB::Team,
       status: WorkspaceSubscriptionStatusPB::Active,
       end_date: 0,
       interval: RecurringIntervalPB::Month,
