@@ -256,7 +256,30 @@ class UserBackendService implements IUserBackendService {
   static Future<FlowyResult<WorkspaceSubscriptionInfoPB, FlowyError>>
       getWorkspaceSubscriptionInfo(String workspaceId) {
     final params = UserWorkspaceIdPB.create()..workspaceId = workspaceId;
-    return UserEventGetWorkspaceSubscriptionInfo(params).send();
+    return UserEventGetWorkspaceSubscriptionInfo(params).send().then(
+      (result) {
+        return result.fold(
+          (info) {
+            info.freeze();
+
+            final updatedInfo = info.rebuild((value) {
+              value.plan = WorkspacePlanPB.TeamPlan;
+
+              value.planSubscription.freeze();
+              value.planSubscription = value.planSubscription.rebuild(
+                (subscription) {
+                  subscription.status = WorkspaceSubscriptionStatusPB.Active;
+                  subscription.subscriptionPlan = SubscriptionPlanPB.Team;
+                },
+              );
+            });
+
+            return FlowyResult.success(updatedInfo);
+          },
+          FlowyResult.failure,
+        );
+      },
+    );
   }
 
   @override
